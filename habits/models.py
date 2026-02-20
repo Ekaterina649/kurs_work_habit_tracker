@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from users.models import User
 
@@ -31,6 +32,35 @@ class Habit(models.Model):
     is_public = models.BooleanField(default=False,verbose_name="Публичность")
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        errors = {}
+
+        if self.related_habit and self.reward:
+            errors['__all__'] = "Нельзя одновременно указывать связанную привычку и вознаграждение."
+
+        if self.execution_time > 120:
+            errors['execution_time'] = "Время выполнения не должно превышать 120 секунд."
+
+        if self.is_pleasant:
+            if self.reward or self.related_habit:
+                errors['__all__'] = "У приятной привычки не может быть вознаграждения или связанной привычки."
+
+        if self.frequency > 7:
+            errors['frequency'] = "Нельзя выполнять привычку реже одного раза в 7 дней."
+
+        if self.related_habit:
+            if not self.related_habit.is_pleasant:
+                errors['related_habit'] = "Связанной может быть только приятная привычка."
+            if self.related_habit.owner != self.owner:
+                errors['related_habit'] = "Можно привязывать только свои приятные привычки."
+
+        if errors:
+            raise ValidationError(errors)
+
+        super().clean()
+
+
 
     def __str__(self):
         return f"{self.action} {self.time} {self.place}"
