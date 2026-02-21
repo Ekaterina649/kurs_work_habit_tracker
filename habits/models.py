@@ -60,10 +60,9 @@ class Habit(models.Model):
 
         super().clean()
 
-
-
     def __str__(self):
-        return f"{self.action} {self.time} {self.place}"
+        type_habit = "Приятная" if self.is_pleasant else "Полезная"
+        return f"{type_habit}: {self.action} в {self.time} ({self.place})"
 
     class Meta:
         verbose_name = "Привычка"
