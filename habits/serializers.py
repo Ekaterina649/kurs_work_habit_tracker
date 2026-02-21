@@ -27,3 +27,17 @@ class HabitSerializer(serializers.ModelSerializer):
             )
 
         return data
+
+
+class PublicHabitSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Habit
+        fields = (
+            "id",
+            "place",
+            "time",
+            "action",
+            "is_pleasant",
+            "is_public",
+        )
