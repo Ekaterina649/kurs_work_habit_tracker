@@ -2,7 +2,6 @@ from django.urls import path, include
 from rest_framework import routers
 from .views import HabitViewSet
 
-
 app_name = "habits"
 
 
@@ -11,5 +10,5 @@ router.register("", HabitViewSet, basename="habits")
 
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]

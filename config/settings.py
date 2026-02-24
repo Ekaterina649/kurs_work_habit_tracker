@@ -3,6 +3,7 @@ from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,15 +29,15 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "users",
     "habits",
-    'rest_framework_simplejwt',
-    'django_celery_beat',
-    'drf_yasg',
-    'corsheaders',
+    "rest_framework_simplejwt",
+    "django_celery_beat",
+    "drf_yasg",
+    "corsheaders",
     "rest_framework",
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -122,7 +123,7 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = "users.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -135,20 +136,20 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
 
-TELEGRAM_ACCESS_TOKEN = os.environ.get('TELEGRAM_ACCESS_TOKEN', None)
+TELEGRAM_ACCESS_TOKEN = os.environ.get("TELEGRAM_ACCESS_TOKEN", None)
 
 api_url = "https://api.telegram.org/bot"
 
 
-CELERY_BROKER_URL = 'redis://localhost:6379' # Например, Redis, который по умолчанию работает на порту 6379
+CELERY_BROKER_URL = "redis://localhost:6379"  # Например, Redis, который по умолчанию работает на порту 6379
 
 # URL-адрес брокера результатов, также Redis
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
 
 # Часовой пояс для работы Celery
 CELERY_TIMEZONE = TIME_ZONE
@@ -161,9 +162,11 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 
 CELERY_BEAT_SCHEDULE = {
-    'task-name': {
-        'task': 'habits.tasks.send_habit_reminders',
-        'schedule': timedelta(minutes=5),  # Расписание выполнения задачи (например, каждые 10 минут)
+    "task-name": {
+        "task": "habits.tasks.send_habit_reminders",
+        "schedule": timedelta(
+            minutes=5
+        ),  # Расписание выполнения задачи (например, каждые 10 минут)
     },
 }
 

@@ -17,7 +17,7 @@ def send_habit_reminders():
                 habit_type = "приятную" if habit.is_pleasant else "полезную"
                 telegram_sendMessage(
                     f"Не забудьте выполнить {habit_type} привычку: {habit.action} ({habit.time})",
-                    chat_id
+                    chat_id,
                 )
             else:
                 print("Нет chat_id для пользователя:", habit.owner)

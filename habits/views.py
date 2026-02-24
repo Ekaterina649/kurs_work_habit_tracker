@@ -1,4 +1,3 @@
-from django.db.models import Q
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -15,8 +14,6 @@ class HabitViewSet(ModelViewSet):
     serializer_class = HabitSerializer
     pagination_class = PaginationHabit
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-
-
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -40,5 +37,3 @@ class HabitViewSet(ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
-
