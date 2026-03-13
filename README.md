@@ -2,252 +2,164 @@
 
 Бэкенд-сервис для отслеживания привычек с отправкой напоминаний через Telegram.
 
-Пользователь может создавать полезные привычки, привязывать к ним приятные привычки или вознаграждения, а также получать уведомления о необходимости выполнить действие.
+**Адрес сервера:** http://158.160.218.82
 
 ---
 
-# Функциональность
+## Функциональность
 
-- Регистрация и авторизация пользователей
+- Регистрация и авторизация пользователей (JWT)
 - CRUD операции с привычками
 - Просмотр публичных привычек
-- Пагинация
+- Пагинация (5 привычек на страницу)
 - Валидация правил привычек
-- Документация API
+- Документация API (Swagger)
 - Интеграция с Telegram
-- Отложенные задачи Celery
-- Настроенный CORS для работы фронтенда
+- Фоновые задачи через Celery + Redis
+- Настроенный CORS
 
 ---
 
-# Описание привычки
+## Технологии
 
-Привычка формируется по принципу:
-
-Я буду **[действие]** в **[время]** в **[место]**
-
-Модель привычки содержит:
-
-- Пользователь — создатель привычки
-- Место выполнения
-- Время выполнения
-- Действие
-- Признак приятной привычки
-- Связанная привычка
-- Периодичность выполнения
-- Вознаграждение
-- Время на выполнение
-- Признак публичности
+- Python 3.12
+- Django 5.2 + Django REST Framework
+- PostgreSQL 16
+- Redis 7
+- Celery + Celery Beat
+- Nginx
+- Docker + Docker Compose
+- GitHub Actions (CI/CD)
 
 ---
 
-# Типы привычек
+## Запуск проекта локально через Docker
 
-## Полезная привычка
+### 1. Клонировать репозиторий
 
-Основное действие пользователя.
-
-После выполнения пользователь получает:
-
-- приятную привычку  
-или  
-- вознаграждение.
-
----
-
-## Приятная привычка
-
-Используется как награда за выполнение полезной привычки.
-
-Ограничения:
-
-- не может иметь вознаграждение
-- не может иметь связанную привычку
-
----
-
-# Валидаторы
-
-В проекте реализованы следующие ограничения:
-
-- нельзя одновременно указывать **вознаграждение** и **связанную привычку**
-- время выполнения привычки не более **120 секунд**
-- связанной может быть только **приятная привычка**
-- приятная привычка не может иметь:
-  - связанную привычку
-  - вознаграждение
-- привычку нельзя выполнять реже **1 раза в 7 дней**
-
----
-
-# Права доступа
-
-Каждый пользователь может:
-
-- создавать привычки
-- редактировать свои привычки
-- удалять свои привычки
-- просматривать свои привычки
-
-Также пользователь может смотреть **публичные привычки** других пользователей без возможности редактирования.
-
----
-
-# Пагинация
-
-Список привычек выводится по **5 привычек на страницу**.
-
----
-
-# API эндпоинты
-
-## Регистрация
-
-```
-POST /users/register/
-```
-
-## Авторизация
-
-```
-POST /users/login/
-```
-
----
-
-# Привычки
-
-Получить список своих привычек
-
-```
-GET /habits/
-```
-
-Получить список публичных привычек
-
-```
-GET /habits/public/
-```
-
-Создать привычку
-
-```
-POST /habits/
-```
-
-Редактировать привычку
-
-```
-PUT /habits/{id}/
-PATCH /habits/{id}/
-```
-
-Удалить привычку
-
-```
-DELETE /habits/{id}/
-```
-
----
-
-
-# Отправка напоминаний
-
-Напоминания отправляются через **Celery** и **Redis**.
-
-Celery worker выполняет задачи отправки сообщений пользователям в Telegram в нужное время.
-
----
-
-# Установка проекта
-
-## 1. Клонировать репозиторий
-
-```
+```bash
 git clone https://github.com/Ekaterina649/kurs_work_habit_tracker.git
+cd kurs_work_habit_tracker
 ```
 
+### 2. Создать файл .env
+
+```bash
+cp .env.example .env
 ```
-cd habit_tracker
+
+Заполните `.env`:
+
+```env
+SECRET_KEY=ваш-секретный-ключ
+DEBUG=False
+ALLOWED_HOSTS=localhost 127.0.0.1
+
+POSTGRES_DB=habit_tracker
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=ваш-пароль
+HOST=db
+PORT=5432
+
+REDIS_URL=redis://redis:6379/0
+
+TELEGRAM_ACCESS_TOKEN=ваш-токен-бота
+```
+
+### 3. Запустить проект одной командой
+
+```bash
+docker compose up -d --build
+```
+
+Приложение будет доступно по адресу: **http://localhost**
+
+---
+
+## Настройка CI/CD (GitHub Actions)
+
+### Как работает пайплайн
+
+При каждом `push` или `pull_request` в ветку `develop`:
+
+1. **test** — запускает `flake8` и `python manage.py test`
+2. **build** — проверяет сборку Docker-образа
+3. **deploy** — деплоит на сервер (только при push в `develop`)
+
+### Необходимые GitHub Secrets
+
+Перейдите в `Settings - Secrets and variables - Actions` и добавьте:
+
+ Секрет       Описание                                        
+
+ `SECRET_KEY`  Django SECRET_KEY                               
+ `SERVER_IP`   IP-адрес сервера                                
+ `SSH_USER`    Пользователь SSH (ubuntu)                       
+ `SSH_KEY`     Приватный SSH-ключ для подключения к серверу    
+ `DEPLOY_DIR`  Путь на сервере (/var/www/habit_tracker)        
+
+---
+
+## Настройка удалённого сервера
+
+### 1. Установка Docker
+
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y ca-certificates curl gnupg
+
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+### 2. Подготовка директории
+
+```bash
+sudo mkdir -p /var/www/habit_tracker
+sudo chown $USER:$USER /var/www/habit_tracker
+cd /var/www/habit_tracker
+git clone https://github.com/Ekaterina649/kurs_work_habit_tracker.git .
+git checkout docker-homework
+```
+
+### 3. Создать .env на сервере
+
+```bash
+nano .env
+```
+
+### 4. Создать SSH-ключ для деплоя
+
+```bash
+ssh-keygen -t ed25519 -C "github-actions" -f ~/.ssh/deploy_key
+cat ~/.ssh/deploy_key.pub >> ~/.ssh/authorized_keys
+cat ~/.ssh/deploy_key  # скопировать в GitHub Secret SSH_KEY
+```
+
+### 5. Запустить проект
+
+```bash
+docker compose up -d --build
 ```
 
 ---
 
-# 2. Создать виртуальное окружение
+## Валидаторы привычек
 
-```
-python -m venv venv
-```
-
----
-
-# 3. Установить зависимости
-
-```
-pip install -r requirements.txt
-```
-
----
-
-# 4. Создать .env файл
-
-Пример:
-
-```
-SECRET_KEY=
-
-DEBUG=
-
-NAME=
-USER=
-PASSWORD=
-HOST=
-PORT=
-STRIPE_SECRET_KEY=
-TELEGRAM_ACCESS_TOKEN=
-```
-
----
-
-# 5. Применить миграции
-
-```
-python manage.py migrate
-```
-
----
-
-# 6. Запустить сервер
-
-```
-python manage.py runserver
-```
-
----
-
-# Запуск Celery
-
-Запуск worker
-
-```
-celery -A config worker --pool=solo --loglevel=info
-```
-
-Запуск планировщика
-
-```
-celery -A config beat --loglevel=info
-```
-
----
-# Технологии
-
-- Python
-- Django
-- Django REST Framework
-- PostgreSQL
-- Redis
-- Celery
-- Telegram Bot API
-
----
+- Нельзя одновременно указывать вознаграждение и связанную привычку
+- Время выполнения не более 120 секунд
+- Связанной может быть только приятная привычка
+- Приятная привычка не может иметь вознаграждение и связанную привычку
+- Нельзя выполнять привычку реже 1 раза в 7 дней
