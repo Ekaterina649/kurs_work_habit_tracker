@@ -9,9 +9,7 @@ from habits.models import Habit
 class HabitModelValidationTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser",
-            email="testuser@example.com",
-            password="testpass123"
+            username="testuser", email="testuser@example.com", password="testpass123"
         )
 
     def test_cannot_have_both_reward_and_related_habit(self):
@@ -21,7 +19,7 @@ class HabitModelValidationTests(TestCase):
             time="18:00:00",
             action="Читать книгу",
             is_pleasant=True,
-            execution_time=60
+            execution_time=60,
         )
         useful = Habit(
             owner=self.user,
@@ -30,7 +28,7 @@ class HabitModelValidationTests(TestCase):
             action="Выпить кофе",
             reward="Съесть круассан",
             related_habit=pleasant,
-            execution_time=15
+            execution_time=15,
         )
         with self.assertRaises(Exception):
             useful.full_clean()
@@ -43,7 +41,7 @@ class HabitModelValidationTests(TestCase):
             action="Прогулка",
             is_pleasant=True,
             reward="Послушать музыку",
-            execution_time=45
+            execution_time=45,
         )
         with self.assertRaises(Exception):
             habit.full_clean()
@@ -55,7 +53,7 @@ class HabitModelValidationTests(TestCase):
             time="20:00:00",
             action="Медитация",
             is_pleasant=True,
-            execution_time=180
+            execution_time=180,
         )
         with self.assertRaises(Exception):
             habit.full_clean()
@@ -64,9 +62,7 @@ class HabitModelValidationTests(TestCase):
 class HabitAPITests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            username="apiuser",
-            email="apiuser@example.com",
-            password="apipass123"
+            username="apiuser", email="apiuser@example.com", password="apipass123"
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
@@ -80,7 +76,7 @@ class HabitAPITests(TestCase):
             "is_pleasant": False,
             "frequency": 1,
             "execution_time": 30,
-            "is_public": False
+            "is_public": False,
         }
         response = self.client.post(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -89,16 +85,14 @@ class HabitAPITests(TestCase):
 
     def test_list_only_own_habits(self):
         other_user = User.objects.create_user(
-            username="other",
-            email="other@example.com",
-            password="pass123"
+            username="other", email="other@example.com", password="pass123"
         )
         Habit.objects.create(
             owner=other_user,
             place="Test",
             time="12:00:00",
             action="Чужая привычка",
-            execution_time=60
+            execution_time=60,
         )
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
