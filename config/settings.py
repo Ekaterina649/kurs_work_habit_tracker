@@ -73,7 +73,7 @@ DATABASES = {
         "NAME": os.getenv("POSTGRES_DB"),
         "USER": os.getenv("POSTGRES_USER"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-        "HOST": os.getenv("HOST"),
+        "HOST": os.getenv("HOST", "localhost"),
         "PORT": os.getenv("PORT",5432),
     }
 }
@@ -184,5 +184,5 @@ SWAGGER_SETTINGS = {
 }
 
 
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_BROKER_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("REDIS_URL", "redis://redis:6379/0")
