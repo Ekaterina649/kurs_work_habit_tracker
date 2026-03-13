@@ -12,3 +12,4 @@ black==26.1.0
 django-cors-headers==4.9.0
 gunicorn==25.1.0
 stripe==14.3.0
+requests==2.32.5
