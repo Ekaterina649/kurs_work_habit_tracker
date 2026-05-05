@@ -8,7 +8,7 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
@@ -74,7 +74,7 @@ DATABASES = {
         "USER": os.getenv("POSTGRES_USER"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
         "HOST": os.getenv("HOST", "localhost"),
-        "PORT": os.getenv("PORT",5432),
+        "PORT": os.getenv("PORT", 5432),
     }
 }
 
